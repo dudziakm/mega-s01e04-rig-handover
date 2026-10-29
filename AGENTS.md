@@ -9,6 +9,7 @@ Read first: `docs/vision.md`, `docs/styleguide.md`. Decisions: `docs/adr/`.
 
 - `pnpm dev` / `pnpm start`: serves on `PORT` (8787). Needs `.env` (copy `.env.example`).
 - `pnpm test`: vitest. `pnpm typecheck`: tsc.
+- A preview for review on this repo's GitHub Pages, and its clean-up: skill `publish-preview`.
 
 ## How work moves here
 
