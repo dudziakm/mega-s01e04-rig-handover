@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import { loadConfig, type RigConfig } from './config.js';
+import { countByLastStatus } from './digest/counts.js';
 import { readNight } from './digest/read.js';
 import { lane } from './lane.js';
 import { readStatus } from './status.js';
@@ -12,13 +13,18 @@ export function createApp(config: RigConfig = loadConfig()) {
 
   app.get('/health', (c) => c.json({ ok: true, lane: lane().id }));
 
-  app.get('/', (c) =>
-    c.html(
+  app.get('/', (c) => {
+    const status = readStatus(config);
+    const nights = status.nights.map((night) => {
+      const read = readNight(config.runsDir, night);
+      return { night, counts: read ? countByLastStatus(read.rows) : null };
+    });
+    return c.html(
       <Layout title="status" lane={lane()}>
-        <StatusBoard status={readStatus(config)} />
+        <StatusBoard status={status} nights={nights} />
       </Layout>,
-    ),
-  );
+    );
+  });
 
   // Page and JSON both come from readNight, so they never disagree (ADR 0001).
   app.get('/digest/:night', (c) => {
